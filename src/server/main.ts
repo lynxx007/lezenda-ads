@@ -31,7 +31,6 @@ app.get("/api/listings", async (req, res) => {
   try {
     const { lat, lng, title } = req.query;
 
-    // If no coordinates provided, return all listings
     if (lat || lng) {
       const searchResult = await search(db, {
         where: {
@@ -41,10 +40,12 @@ app.get("/api/listings", async (req, res) => {
                 lat: parseFloat(lat as string),
                 lon: parseFloat(lng as string),
               },
-              value: 2000,
+              value: 50000,
+              unit: "km",
             },
           },
         },
+        limit: 100,
       });
       return res.json(searchResult.hits);
     }
@@ -61,6 +62,7 @@ app.get("/api/listings", async (req, res) => {
     else {
       const searchResult = await search(db, {
         term: title as string,
+        limit: 100,
       });
 
       res.json(searchResult.hits);
