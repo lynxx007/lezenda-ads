@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Navbar from "./components/Navbar";
 import Map from "./components/Map";
 import ListingComponent from "./components/Listing";
-import { Listing } from "./components/Listing";
+import type { Listing } from "./components/Listing";
 
 function App() {
   const [searchLocation, setSearchLocation] = useState<any>(null);
@@ -37,7 +37,6 @@ function App() {
     }
   }, [searchLocation]);
 
-  // Add new effect for coordinate changes
   useEffect(() => {
     if (coordinate && !isMapMoving) {
       updateListings(undefined, coordinate.lat, coordinate.lng);
