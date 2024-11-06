@@ -53,7 +53,25 @@ app.get("/api/listings", async (req, res) => {
         });
         return res.json(searchResult.hits);
       }
-      if (parsedZoom >= 11 && parsedZoom <= 12) {
+      if (parsedZoom === 11) {
+        const searchResult = await search(db, {
+          where: {
+            location: {
+              radius: {
+                coordinates: {
+                  lat: parseFloat(lat as string),
+                  lon: parseFloat(lng as string),
+                },
+                value: 15000,
+                inside: true,
+              },
+            },
+          },
+          limit: 100,
+        });
+        return res.json(searchResult.hits);
+      }
+      if (parsedZoom === 12) {
         // Define search behavior for zoom level 13
         const searchResult = await search(db, {
           where: {
