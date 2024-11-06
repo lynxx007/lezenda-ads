@@ -29,42 +29,72 @@ app.get("/hello", async (_, res) => {
 
 app.get("/api/listings", async (req, res) => {
   try {
-    const { lat, lng, title } = req.query;
+    const { lat, lng, title, zoom } = req.query;
 
     if (lat || lng) {
-      const searchResult = await search(db, {
-        where: {
-          location: {
-            radius: {
-              coordinates: {
-                lat: parseFloat(lat as string),
-                lon: parseFloat(lng as string),
+      const parsedZoom = parseInt(zoom as string);
+
+      if (parsedZoom >= 8 && parsedZoom <= 10) {
+        const searchResult = await search(db, {
+          where: {
+            location: {
+              radius: {
+                coordinates: {
+                  lat: parseFloat(lat as string),
+                  lon: parseFloat(lng as string),
+                },
+                value: 100000000,
+                inside: true,
+                unit: "km",
               },
-              value: 50000,
-              unit: "km",
             },
           },
-        },
-        limit: 100,
-      });
-      return res.json(searchResult.hits);
-    }
-
-    // Convert lat/lng to numbers
-    // const latitude = parseFloat(lat as string);
-    // const longitude = parseFloat(lng as string);
-
-    // Increase the range for a wider search area, e.g., 0.1 degrees
-    // const listings = await Listing.find({
-    //   latitude: { $gte: latitude - 0.1, $lte: latitude + 0.1 },
-    //   longitude: { $gte: longitude - 0.1, $lte: longitude + 0.1 },
-    // });
-    else {
+          limit: 100,
+        });
+        return res.json(searchResult.hits);
+      }
+      if (parsedZoom >= 11 && parsedZoom <= 12) {
+        // Define search behavior for zoom level 13
+        const searchResult = await search(db, {
+          where: {
+            location: {
+              radius: {
+                coordinates: {
+                  lat: parseFloat(lat as string),
+                  lon: parseFloat(lng as string),
+                },
+                value: 5000,
+                inside: true,
+              },
+            },
+          },
+          limit: 100,
+        });
+        return res.json(searchResult.hits);
+      }
+      if (parsedZoom >= 13) {
+        const searchResult = await search(db, {
+          where: {
+            location: {
+              radius: {
+                coordinates: {
+                  lat: parseFloat(lat as string),
+                  lon: parseFloat(lng as string),
+                },
+                value: 5000,
+                inside: true,
+              },
+            },
+          },
+          limit: 100,
+        });
+        return res.json(searchResult.hits);
+      }
+    } else {
       const searchResult = await search(db, {
         term: title as string,
         limit: 100,
       });
-
       res.json(searchResult.hits);
     }
   } catch (error) {
