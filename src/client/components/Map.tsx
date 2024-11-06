@@ -24,6 +24,7 @@ interface MapProps {
   listings: Listing[];
   setCoordinate: React.Dispatch<React.SetStateAction<any>>;
   setIsMapMoving: React.Dispatch<React.SetStateAction<boolean>>;
+  setZoom: React.Dispatch<React.SetStateAction<number>>;
 }
 
 function CustomPopup({ listing }: { listing: any }) {
@@ -77,10 +78,12 @@ function LocationLogger({
   onMapMove,
   setCoordinate,
   setIsMapMoving,
+  setZoom,
 }: {
   onMapMove: (title?: string, lat?: number, lng?: number) => void;
   setCoordinate: React.Dispatch<React.SetStateAction<any>>;
   setIsMapMoving: React.Dispatch<React.SetStateAction<boolean>>;
+  setZoom: React.Dispatch<React.SetStateAction<number>>;
 }) {
   const timeoutRef = useRef<NodeJS.Timeout>();
 
@@ -91,6 +94,10 @@ function LocationLogger({
     moveend: (event) => {
       const map = event.target;
       const { lat, lng } = map.getCenter();
+      console.log("Map moved to:", lat, lng);
+      const zoom = map.getZoom();
+      console.log("Map zoom level:", zoom);
+      setZoom(zoom);
       setCoordinate({ lat, lng });
 
       // Clear any existing timeout
@@ -123,6 +130,7 @@ export default function Map({
   listings,
   setCoordinate,
   setIsMapMoving,
+  setZoom,
 }: MapProps) {
   const mapRef = useRef(null);
   const [shouldUpdate, setShouldUpdate] = useState(false);
@@ -185,6 +193,7 @@ export default function Map({
           onMapMove={onMapMove}
           setCoordinate={setCoordinate}
           setIsMapMoving={setIsMapMoving}
+          setZoom={setZoom}
         />
         {listings.map((listing) => (
           <Marker

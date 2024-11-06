@@ -10,8 +10,14 @@ function App() {
   const [coordinate, setCoordinate] = useState<any>(null);
   const [listings, setListings] = useState<Listing[]>([]);
   const [isMapMoving, setIsMapMoving] = useState(false);
+  const [zoom, setZoom] = useState<number>(0);
 
-  const updateListings = async (title?: string, lat?: number, lng?: number) => {
+  const updateListings = async (
+    title?: string,
+    lat?: number,
+    lng?: number,
+    zoom?: number
+  ) => {
     if (title) {
       try {
         const res = await fetch(`/api/listings?title=${title}`);
@@ -20,9 +26,11 @@ function App() {
       } catch (error) {
         console.error("Error fetching listings:", error);
       }
-    } else if (lat && lng) {
+    } else if (lat && lng && zoom) {
       try {
-        const res = await fetch(`/api/listings?lat=${lat}&lng=${lng}`);
+        const res = await fetch(
+          `/api/listings?lat=${lat}&lng=${lng}&zoom=${zoom}`
+        );
         const data = await res.json();
         setListings(data);
       } catch (error) {
@@ -33,15 +41,15 @@ function App() {
 
   useEffect(() => {
     if (searchLocation) {
-      updateListings(searchLocation, undefined, undefined);
+      updateListings(searchLocation, undefined, undefined, undefined);
     }
   }, [searchLocation]);
 
   useEffect(() => {
-    if (coordinate && !isMapMoving) {
-      updateListings(undefined, coordinate.lat, coordinate.lng);
+    if (coordinate && !isMapMoving && zoom >= 8) {
+      updateListings(undefined, coordinate.lat, coordinate.lng, zoom);
     }
-  }, [coordinate, isMapMoving]);
+  }, [coordinate, isMapMoving, zoom]);
 
   if (searchLocation || listings.length > 0) {
     return (
@@ -59,6 +67,7 @@ function App() {
                 listings={listings}
                 setCoordinate={setCoordinate}
                 setIsMapMoving={setIsMapMoving}
+                setZoom={setZoom}
               />
             </div>
           </div>
@@ -78,6 +87,7 @@ function App() {
             listings={listings}
             setCoordinate={setCoordinate}
             setIsMapMoving={setIsMapMoving}
+            setZoom={setZoom}
           />
         </div>
       </main>
